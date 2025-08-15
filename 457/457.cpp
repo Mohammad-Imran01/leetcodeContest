@@ -47,6 +47,19 @@ Constraints:
 1 ≤ c ≤ 1e5, 0 ≤ connections ≤ 1e5, queries ≤ 2e5
 */
 
+/*
+Q3. Minimum Time for K Connected Components (Medium)
+
+Given an undirected graph with n nodes (0..n-1) and edges[i] = [u, v, t]
+where t is the time an edge can be removed, find the minimum time t
+such that after removing all edges with time <= t, the graph has
+at least k connected components.
+
+- Nodes may be initially connected or disconnected.
+- Return the minimum t satisfying the condition.
+- 1 <= n <= 1e5, 0 <= edges.length <= 1e5, 1 <= t <= 1e9, 1 <= k <= n.
+*/
+
 class Solution457
 {
     const string t1 = "electronics";
@@ -190,6 +203,91 @@ public:
             }
         }
 
+        return res;
+    }
+
+    struct Disjoint3
+    {
+        vector<int> par, weight;
+        Disjoint3(int n)
+        {
+            par.resize(n);
+            weight.assign(n, 1);
+            for (int i = 0; i < n; ++i)
+                par[i] = i;
+        }
+        void join(int x, int y)
+        {
+            x = getPar(x);
+            y = getPar(y);
+            if (weight[x] > weight[y])
+            {
+                par[y] = x;
+            }
+            else if (weight[x] < weight[y])
+            {
+                par[x] = y;
+            }
+            else
+            {
+                par[y] = x;
+                ++weight[x];
+            }
+        }
+        int getPar(int node)
+        {
+            if (par[node] == node)
+                return node;
+            return par[node] = getPar(par[node]);
+        }
+
+        int count()
+        {
+            int res = 0;
+            for (int i = 0; i < par.size(); ++i)
+                if (par[i] == i)
+                    res++;
+            return res;
+        }
+    };
+
+    // rem all node with time > t, but node count must be >= k
+    bool func(int n, vector<vector<int>> &edges, int k, int timeAllowed)
+    {
+        Disjoint3 ds(n);
+
+        for (const auto &edge : edges)
+        {
+            if (edge[2] <= timeAllowed)
+                continue;
+
+            ds.join(edge[0], edge[1]);
+        }
+
+        return ds.count() >= k;
+    }
+    int minTime(int n, vector<vector<int>> &edges, int k)
+    {
+        if (edges.size() == 0)
+            return 0;
+        int maxi = -1e8;
+        for (const auto &edge : edges)
+            maxi = max(maxi, edge[2]);
+        int left = 0, right = maxi;
+        int res = maxi;
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2;
+            if (func(n, edges, k, mid))
+            {
+                res = mid;
+                right = mid - 1;
+            }
+            else
+            {
+                left = mid + 1;
+            }
+        }
         return res;
     }
 };
