@@ -28,6 +28,25 @@ Example:
 Constraints:
     1 <= n <= 100
 */
+
+/*
+Q2. Power Grid Maintenance
+
+We have c power stations (1..c) connected by bidirectional cables (connections[]).
+Connected stations form a "power grid". Initially, all stations are online.
+
+Queries:
+[1, x] → Maintenance check:
+          - If x is online, return x.
+          - If x is offline, return the smallest online station in x's grid, or -1 if none.
+[2, x] → Take station x offline (remains part of grid structure).
+
+Goal: Process all queries in order and output answers for type [1, x].
+
+Constraints:
+1 ≤ c ≤ 1e5, 0 ≤ connections ≤ 1e5, queries ≤ 2e5
+*/
+
 class Solution457
 {
     const string t1 = "electronics";
@@ -67,6 +86,61 @@ class Solution457
         return 4; // Unknown category
     }
 
+    struct Disjoint
+    {
+        V1<int> par, weight, active;
+        Disjoint(int n)
+        {
+            par.resize(n + 1),
+                weight.assign(n + 1, 1),
+                active.assign(n + 1, true);
+            for (int i = 1; i <= n; ++i)
+                par[i] = i;
+        }
+        void join(int x, int y)
+        {
+            x = getPar(x);
+            y = getPar(y);
+            if (weight[x] > weight[y])
+            {
+                par[y] = x;
+            }
+            else if (weight[x] < weight[y])
+            {
+                par[x] = y;
+            }
+            else
+            {
+                par[y] = x;
+                ++weight[x];
+            }
+        }
+        int getPar(int node)
+        {
+            if (par[node] == node)
+                return node;
+            return par[node] = getPar(par[node]);
+        }
+        void disable(int node)
+        {
+            active[node] = false;
+        }
+        int getActive(int node)
+        {
+            if (active[node])
+                return node;
+            int res = -1;
+            node = getPar(node);
+            for (int i = 1; i < weight.size(); ++i)
+                if (active[i] && getPar(i) == node)
+                {
+                    res = i;
+                    break;
+                }
+            return res;
+        }
+    };
+
 public:
     V1<string> validateCoupons(const V1<string> &coupons, const V1<string> &companies, const V1<bool> &isActive)
     {
@@ -93,5 +167,29 @@ public:
         }
 
         return result;
+    }
+
+public:
+    V1<int> processQueries(int c, vector<V1<int>> &conn, vector<V1<int>> &queries)
+    {
+        Disjoint ds(c);
+        for (const auto &p : conn)
+            ds.join(p[0], p[1]);
+        V1<int> res;
+
+        for (const auto &q : queries)
+        {
+            bool check = q[0] == 1;
+            if (check)
+            {
+                res.push_back(ds.getActive(q[1]));
+            }
+            else
+            {
+                ds.disable(q[1]);
+            }
+        }
+
+        return res;
     }
 };
