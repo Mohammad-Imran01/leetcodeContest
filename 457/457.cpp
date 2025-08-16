@@ -208,7 +208,7 @@ public:
 
     struct Disjoint3
     {
-        vector<int> par, weight;
+        V1<int> par, weight;
         Disjoint3(int n)
         {
             par.resize(n);
@@ -252,7 +252,7 @@ public:
     };
 
     // rem all node with time > t, but node count must be >= k
-    bool func(int n, vector<vector<int>> &edges, int k, int timeAllowed)
+    bool func(int n, vector<V1<int>> &edges, int k, int timeAllowed)
     {
         Disjoint3 ds(n);
 
@@ -266,7 +266,7 @@ public:
 
         return ds.count() >= k;
     }
-    int minTime(int n, vector<vector<int>> &edges, int k)
+    int minTime(int n, vector<V1<int>> &edges, int k)
     {
         if (edges.size() == 0)
             return 0;
