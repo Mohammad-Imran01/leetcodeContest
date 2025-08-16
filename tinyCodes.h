@@ -11,3 +11,6 @@ using namespace std;
 
 template <typename Type>
 using V1 = vector<Type>;
+
+template <typename Type>
+using V2 = vector<vector<Type>>;
