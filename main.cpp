@@ -1,4 +1,5 @@
-#include "./457/457.cpp"
+#include "weekly/457.cpp"
+#include "BiWeekly/160.cpp"
 
 int main()
 {
